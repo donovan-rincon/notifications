@@ -51,18 +51,18 @@ func (c Channels) String() string {
 
 type Message struct {
 	ID         string
-	Categories Categories
+	Categories []Categories
 	Content    string
 }
 
 type NotificationService interface {
-	ParseMessage(msg []byte) (Message, error)
-	SendMessage(msg Message, users []User) error
+	Notify(msg Message) error
 }
 
 type StorageService interface {
 	Users() ([]User, error)
 	UsersByCategory(categories Categories) ([]User, error)
+	UsersByChannel(channel Channels) ([]User, error)
 	StoreMessage(msg Message) error
 	Messages() ([]Message, error)
 }
