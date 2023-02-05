@@ -1,23 +1,26 @@
 package notifications
 
+var Storage StorageService
+var Notifiers []NotificationService
+
 type User struct {
-	ID          string
-	Name        string
-	Email       string
-	PhoneNumber int
-	Subscribed  map[string]bool
-	Channels    map[string]bool
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Email       string          `json:"email"`
+	PhoneNumber int             `json:"phone-number"`
+	Subscribed  map[string]bool `json:"subscribed"`
+	Channels    map[string]bool `json:"channels"`
 }
 
-type Categories int64
+type Category int64
 
 const (
-	Finance Categories = iota
+	Finance Category = iota
 	Movies
 	Sports
 )
 
-func (c Categories) String() string {
+func (c Category) String() string {
 	switch c {
 	case Finance:
 		return "finance"
@@ -29,15 +32,15 @@ func (c Categories) String() string {
 	return "unknown"
 }
 
-type Channels int64
+type Channel int64
 
 const (
-	Email Channels = iota
+	Email Channel = iota
 	PushNotifications
 	SMS
 )
 
-func (c Channels) String() string {
+func (c Channel) String() string {
 	switch c {
 	case Email:
 		return "email"
@@ -50,9 +53,9 @@ func (c Channels) String() string {
 }
 
 type Message struct {
-	ID         string
-	Categories []Categories
-	Content    string
+	ID         string     `json:"id"`
+	Categories []Category `json:"categories"`
+	Content    string     `json:"content"`
 }
 
 type NotificationService interface {
@@ -61,8 +64,8 @@ type NotificationService interface {
 
 type StorageService interface {
 	Users() ([]User, error)
-	UsersByCategory(categories Categories) ([]User, error)
-	UsersByChannel(channel Channels) ([]User, error)
+	UsersByCategory(categories Category) ([]User, error)
+	UsersByChannel(channel Channel) ([]User, error)
 	StoreMessage(msg Message) error
 	Messages() ([]Message, error)
 }

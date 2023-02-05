@@ -1,10 +1,12 @@
 package pushnotifications
 
 import (
+	"encoding/json"
 	"log"
 	"time"
 
 	n "github.com/gila-software/backend/notifications"
+	ns "github.com/gila-software/backend/notifications/internal/notification-services"
 )
 
 type NotificationService struct {
@@ -12,9 +14,24 @@ type NotificationService struct {
 }
 
 func (s *NotificationService) Notify(msg n.Message) error {
-	users, _ := s.Storage.UsersByChannel(n.PushNotifications)
-	for _, u := range users {
-		log.Printf("Notification type: %s, Sent to user: %s. Timestamp: %s, Message content: %s", n.PushNotifications.String(), string(u.Name), time.Now(), msg.Content)
+	sendMessage := false
+	for _, c := range msg.Categories {
+		if c == n.Category(n.PushNotifications) {
+			sendMessage = true
+		}
+	}
+	if sendMessage {
+		users, _ := s.Storage.UsersByChannel(n.PushNotifications)
+		for _, u := range users {
+			logMsg := &ns.LogMessage{
+				NotificationType: n.PushNotifications.String(),
+				User:             u,
+				Timestamp:        time.Now().Format("2006-01-02 15:04:05"),
+				Message:          msg,
+			}
+			out, _ := json.Marshal(logMsg)
+			log.Println(string(out))
+		}
 	}
 	return nil
 }

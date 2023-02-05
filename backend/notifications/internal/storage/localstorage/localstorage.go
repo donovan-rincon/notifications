@@ -48,7 +48,7 @@ func (s *StorageService) Users() ([]n.User, error) {
 	return s.DB["users"].([]n.User), nil
 }
 
-func (s *StorageService) UsersByCategory(category n.Categories) ([]n.User, error) {
+func (s *StorageService) UsersByCategory(category n.Category) ([]n.User, error) {
 	res := []n.User{}
 	for _, u := range s.DB["users"].([]n.User) {
 		if u.Subscribed[category.String()] {
@@ -58,7 +58,7 @@ func (s *StorageService) UsersByCategory(category n.Categories) ([]n.User, error
 	return res, nil
 }
 
-func (s *StorageService) UsersByChannel(channel n.Channels) ([]n.User, error) {
+func (s *StorageService) UsersByChannel(channel n.Channel) ([]n.User, error) {
 	res := []n.User{}
 	for _, u := range s.DB["users"].([]n.User) {
 		if u.Channels[channel.String()] {
