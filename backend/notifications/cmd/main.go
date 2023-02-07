@@ -17,41 +17,6 @@ func main() {
 	ls := localstorage.NewLocalStorage()
 	n.Storage = &ls
 
-	/*
-		msgs := []n.Message{
-			{
-				ID:         "1",
-				Categories: []n.Categories{n.Finance, n.Sports},
-				Content:    "Test content 1",
-			},
-			{
-				ID:         "2",
-				Categories: []n.Categories{n.Movies, n.Sports},
-				Content:    "Test content 2",
-			},
-			{
-				ID:         "3",
-				Categories: []n.Categories{n.Movies},
-				Content:    "Test content 3",
-			},
-			{
-				ID:         "4",
-				Categories: []n.Categories{n.Finance},
-				Content:    "Test content 4",
-			},
-			{
-				ID:         "5",
-				Categories: []n.Categories{n.Sports},
-				Content:    "Test content 5",
-			},
-			{
-				ID:         "6",
-				Categories: []n.Categories{n.Finance, n.Sports, n.Movies},
-				Content:    "Test content 6",
-			},
-		}
-	*/
-
 	n.Notifiers = []n.NotificationService{
 		&sms.NotificationService{
 			Storage: n.Storage,
@@ -64,6 +29,10 @@ func main() {
 		},
 	}
 
-	http.HandleFunc("/message", handlers.Handler)
+	http.HandleFunc("/message", handlers.MessagesHandler)
+	http.HandleFunc("/messages", handlers.MessagesHandler)
+	http.HandleFunc("/logs/messages", handlers.LogsMessagesHandler)
+	http.HandleFunc("/categories", handlers.CategoriesHandler)
+	http.HandleFunc("/users", handlers.UsersHandler)
 	http.ListenAndServe(":8080", handlers.LoggingMiddleware(http.DefaultServeMux))
 }

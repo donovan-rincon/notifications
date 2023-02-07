@@ -1,24 +1,27 @@
 package notificationservices
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 
 	"github.com/gila-software/backend/notifications"
 )
 
-type LogMessage struct {
-	NotificationType string                `json:"notification-type"`
-	User             notifications.User    `json:"user"`
-	Timestamp        string                `json:"timestamp"`
-	Message          notifications.Message `json:"message"`
+func Init() {
+	log.Default()
 }
 
-func Init() {
-	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+func LogMessage(msg notifications.LogggerMessage) {
+	file, err := os.OpenFile("messages_logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.SetOutput(file)
-	log.SetFlags(1)
+	defer file.Close()
+	line, _ := json.Marshal(msg)
+	_, err = file.Write(line)
+	if err != nil {
+		log.Println("Could not write text to messages_logs.txt")
+	}
+	file.WriteString("\n")
 }

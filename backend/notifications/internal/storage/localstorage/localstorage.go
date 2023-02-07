@@ -1,6 +1,12 @@
 package localstorage
 
 import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+
 	n "github.com/gila-software/backend/notifications"
 )
 
@@ -35,11 +41,14 @@ var mockUsers []n.User = []n.User{
 	},
 }
 
+var categories map[string]n.Category = map[string]n.Category{n.Finance.String(): n.Finance, n.Movies.String(): n.Movies, n.Sports.String(): n.Sports}
+
 func NewLocalStorage() StorageService {
 	return StorageService{
 		DB: map[string]interface{}{
-			"users":    mockUsers,
-			"messages": []n.Message{},
+			"users":      mockUsers,
+			"messages":   []n.Message{},
+			"categories": categories,
 		},
 	}
 }
@@ -75,4 +84,37 @@ func (s *StorageService) StoreMessage(msg n.Message) error {
 
 func (s *StorageService) Messages() ([]n.Message, error) {
 	return s.DB["messages"].([]n.Message), nil
+}
+
+func (s *StorageService) Categories() (map[string]n.Category, error) {
+	return s.DB["categories"].(map[string]n.Category), nil
+}
+
+func (s *StorageService) MessagesHistory() []n.LogggerMessage {
+	response := []n.LogggerMessage{}
+	readFile, err := os.Open("messages_logs.txt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer readFile.Close()
+
+	fileScanner := bufio.NewScanner(readFile)
+
+	fileScanner.Split(bufio.ScanLines)
+
+	for fileScanner.Scan() {
+		var msg n.LogggerMessage
+		err := json.Unmarshal(fileScanner.Bytes(), &msg)
+		if err != nil {
+			log.Println(err.Error())
+		}
+		response = append(response, msg)
+	}
+
+	for i := 0; i < len(response)/2; i++ {
+		j := len(response) - i - 1
+		response[i], response[j] = response[j], response[i]
+	}
+
+	return response
 }

@@ -3,6 +3,13 @@ package notifications
 var Storage StorageService
 var Notifiers []NotificationService
 
+type LogggerMessage struct {
+	NotificationType string  `json:"notification-type"`
+	User             User    `json:"user"`
+	Timestamp        string  `json:"timestamp"`
+	Message          Message `json:"message"`
+}
+
 type User struct {
 	ID          string          `json:"id"`
 	Name        string          `json:"name"`
@@ -68,4 +75,6 @@ type StorageService interface {
 	UsersByChannel(channel Channel) ([]User, error)
 	StoreMessage(msg Message) error
 	Messages() ([]Message, error)
+	Categories() (map[string]Category, error)
+	MessagesHistory() []LogggerMessage
 }
